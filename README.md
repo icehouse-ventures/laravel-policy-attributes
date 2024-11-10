@@ -10,9 +10,9 @@ Laravel provides us with world-class tools for foundation level user authenticat
 
 The proposal is in two parts:
 
-1. <Strong>Authorise Resource Default Closed</Strong> - An update to the framework's AuthorizeResource trait to support 'default closed' instead of current 'default open'. This would be a breaking change for existing applications, so the proposal is to pass a parameter to the trait to opt-in to the new behaviour. Naming for the prop could be 'defaultClosed' or 'defaultRestricted' or 'zeroTrust'. Other options could be to add a new trait such as "AuthorizeResourceDefaultClosed" or to add a new middleware called "NeedsAuthorization" that checks whether a policy call has been made at some point in the request lifecycle (whether via the AuthorizeResource trait or directly or via middleware). The locked-by-default is an example of the 'dead man's switch' security pattern which makes the experience for an individual developer in the moment 'worse' because they have to remember to unlock the resource before they can perform an action, but makes the overall application more secure by default.
+1. <Strong>Authorise Resource Default Closed</Strong> - An update to the framework's AuthorizeResource trait to support 'default closed' instead of current 'default open'. This would be a breaking change for existing applications, so the proposal is to pass a parameter to the trait to opt-in to the new behaviour. Naming for the prop could be 'defaultClosed' or 'defaultRestricted' or 'zeroTrust'. Other options could be to add a new trait such as "AuthorizeResourceDefaultClosed", or "EnforcePolicy", or to add a new middleware called "NeedsAuthorization" that checks whether a policy call has been made at some point in the request lifecycle (whether via the AuthorizeResource trait or directly or via middleware). The locked-by-default is an example of the 'dead man's switch' security pattern which makes the experience for an individual developer in the moment 'worse' because they have to remember to unlock the resource before they can perform an action, but makes the overall application more secure by default.
 
-2. <Strong>Policy Mapping with Attributes</Strong> - Ability to map policies to resources using php attributes. This helps smooth adoption of Policies and allows more a more declarative way to satisfy the "authorisation required" approach. Php attributes are a powerful feature of the language that are gaining increasing adoption across the Laravel community. Policy mapping is a uniquely good use case for attributes because the co-location of the mapping and the controller actions makes the code easier to understand and maintain.
+2. <Strong>Policy Mapping with Attributes</Strong> - Ability to map policies to resources using php attributes. This helps smooth adoption of Policies and allows more a more declarative way to satisfy the "authorisation required" approach. Php attributes are a powerful feature of the language that are gaining increasing adoption across the Laravel community. Policy mapping is a uniquely good use case for attributes because the co-location of the mapping and the controller actions makes the code easier to understand and maintain. The naming of the attributes is an open question. The proposal uses Policy. Other attribute names we considered included Can, PolicyCheck, PolicyMap and CustomPolicyMapping.
 
 # Security layers:
 | Layer | Description | Example Question |
@@ -25,6 +25,89 @@ The proposal is in two parts:
 
 To make the proposed framework changes clearer and to encourage broad discussion among the Laravel security community, this package provides a proof of concept 'package based'implementation of the proposed changes. The proof of concept uses archtiecture patterns that would not be neccessary for the framework level changes to be implemented (Traits, Custom Middleware, Contracts, etc). 
 
+# Installation
+
+```bash
+composer require icehouse-ventures/laravel-policy-attributes
+```
+
+To apply the 'default closed' pattern, add the following to your controller:
+
+```php
+use IcehouseVentures\LaravelPolicyAttributes\Traits\HasPolicyAttributes;
+
+class PostController extends Controller
+{
+    use HasPolicyAttributes;
+}
+```
+
+To apply the policy mapping attributes, add the following to your controller:
+
+```php
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
+
+class PostController extends Controller
+{
+    
+    #[Policy('view')]
+    public function showComments(Post $post): Post
+    {
+        return $post;
+    }
+}
+```
+
+# Usage Examples
+In the example below, the `PostPolicy` will be called with the `view` method and the `$post` instance.
+
+```php
+// Simple attribute mapping
+#[Policy('view')]
+public function showComments(Post $post): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different policy
+#[Policy(policy: ImagePolicy::class, method: 'view', parameter: 'image')]
+public function showPostAttachments(Post $post, Image $image): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different method
+#[Policy(policy: PostPolicy::class, method: 'view', parameter: 'post')]
+public function showPostAttachments(Post $post): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different instance
+#[Policy(policy: PostPolicy::class, method: 'view', parameter: 'post', id: 'postId')]
+public function showPostAttachments(Post $post): Post
+{
+    return $post;
+}
+```
+
+# References
+
+Stephen Rees Carter's article on the resource authorisation pattern which points out the "default open" issue with the current approach framework provided AuthorizeResource trait. This article was the seed crystal for the current proposal.
+
+https://securinglaravel.com/security-tip-watch-out-for-resource/
+
+An earlier approach to authorisation attributes. This is more flexible and powerful but our intention with the current proposal is to enhance the existing Policy class and AuthorizeResource trait.
+
+https://github.com/Codestagero/laravel-authorization
+
+A recent twitter thread from [@NewtonJob](https://github.com/newtonjob) with a code sample showing how to use attributes to map policies to resources.
+
+https://x.com/_newtonjob/status/1845432101283279331
+
+The underlying 'default closed' pattern in cyber security was explained at Laracon AU 2024 by Jack Skinner using the example of a train with parking brakes that defaulted to being off.
+
+https://www.youtube.com/watch?v=OWhEvdc2pSM&t=2024s
 
 # Test Cases
 
@@ -82,74 +165,8 @@ To make the proposed framework changes clearer and to encourage broad discussion
 2. Policy method is called.
 3. Pass or fail as appropriate to Policy (check correct model instance is used).
 
-# Installation
+# Future Work
+This package is a proof of concept for the proposed changes to the Laravel framework. In the meantime, this package provides an approach to 'default closed' authorisation that may be useful to businesses required to complete penetration testing or other security reviews where the 'default open' approach is not acceptable or may lead to exposed endpoints.
 
-```bash
-composer require icehouse-ventures/laravel-policy-attributes
-```
-
-To apply the 'default closed' pattern, add the following to your middleware stack:
-
-```php
-'web' => [
-    \IcehouseVentures\LaravelPolicyAttributes\Middleware\NeedsAuthorization::class,
-],
-```
-
-To apply the policy mapping attributes, add the following to your controller:
-
-```php
-#[MapPolicyToResource]
-```
-
-# Usage
-In the example below, the `PostPolicy` will be called with the `view` method and the `$post` instance.
-
-```php
-// Simple attribute mapping
-#[PolicyCheck('view')]
-public function viewPostComments(Post $post): Post
-{
-    return $post;
-}
-
-// Complex attribute mapping: Check a different policy
-#[PolicyCheck(policy: ImagePolicy::class, method: 'view', parameter: 'image')]
-public function viewPostAttachments(Post $post, Image $image): Post
-{
-    return $post;
-}
-
-// Complex attribute mapping: Check a different method
-#[PolicyCheck(policy: PostPolicy::class, method: 'view', parameter: 'post')]
-public function viewPostAttachments(Post $post): Post
-{
-    return $post;
-}
-
-// Complex attribute mapping: Check a different instance
-#[PolicyCheck(policy: PostPolicy::class, method: 'view', parameter: 'post', id: 'postId')]
-public function viewPostAttachments(Post $post): Post
-{
-    return $post;
-}
-```
-
-# References
-
-Stephen Rees Carter's article on the resource authorisation pattern which points out the "default open" issue with the current approach framework provided AuthorizeResource trait. This article was the seed crystal for the current proposal.
-
-https://securinglaravel.com/security-tip-watch-out-for-resource/
-
-An earlier approach to authorisation attributes. This is more flexible and powerful but our intention with the current proposal is to enhance the existing Policy class and AuthorizeResource trait.
-
-https://github.com/Codestagero/laravel-authorization
-
-A recent twitter thread from [@NewtonJob](https://github.com/newtonjob) with a code sample showing how to use attributes to map policies to resources.
-
-https://x.com/_newtonjob/status/1845432101283279331
-
-The underlying 'default closed' pattern in cyber security was explained at Laracon AU 2024 by Jack Skinner using the example of a train with parking brakes that defaulted to being off.
-
-https://www.youtube.com/watch?v=OWhEvdc2pSM&t=2024s
-
+# Alternatives
+In the theory, Pest architecture tests could be used to test whether all controller actions are covered by a policy. Another approach would be to use middleware more extensively to check that a policy has been called at some point in the request lifecycle.
