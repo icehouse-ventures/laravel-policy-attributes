@@ -10,9 +10,9 @@ Laravel provides us with world-class tools for foundation level user authenticat
 
 The proposal is in two parts:
 
-1. An update to the framework's AuthorizeResource trait to support 'default closed' instead of current 'default open'. This would be a breaking change for existing applications, so the proposal is to pass a parameter to the trait to opt-in to the new behaviour. Naming for the prop could be 'defaultClosed' or 'defaultRestricted' or 'zeroTrust'. Other options could be to add a new trait such as "AuthorizeResourceDefaultClosed" or to add a new middleware called "NeedsAuthorization" that checks whether a policy call has been made at some point in the request lifecycle (whether via the AuthorizeResource trait or directly or via middleware). The locked-by-default is an example of the 'dead man's switch' security pattern which makes the experience for an individual developer in the moment 'worse' because they have to remember to unlock the resource before they can perform an action, but makes the overall application more secure by default.
+1. <Strong>Authorise Resource Default Closed</Strong> - An update to the framework's AuthorizeResource trait to support 'default closed' instead of current 'default open'. This would be a breaking change for existing applications, so the proposal is to pass a parameter to the trait to opt-in to the new behaviour. Naming for the prop could be 'defaultClosed' or 'defaultRestricted' or 'zeroTrust'. Other options could be to add a new trait such as "AuthorizeResourceDefaultClosed" or to add a new middleware called "NeedsAuthorization" that checks whether a policy call has been made at some point in the request lifecycle (whether via the AuthorizeResource trait or directly or via middleware). The locked-by-default is an example of the 'dead man's switch' security pattern which makes the experience for an individual developer in the moment 'worse' because they have to remember to unlock the resource before they can perform an action, but makes the overall application more secure by default.
 
-2. Ability to map policies to resources using php attributes. This helps smooth adoption of Policies and allows more a more declarative way to satisfy the "authorisation required" approach.
+2. <Strong>Policy Mapping with Attributes</Strong> - Ability to map policies to resources using php attributes. This helps smooth adoption of Policies and allows more a more declarative way to satisfy the "authorisation required" approach. Php attributes are a powerful feature of the language that are gaining increasing adoption across the Laravel community. Policy mapping is a uniquely good use case for attributes because the co-location of the mapping and the controller actions makes the code easier to understand and maintain.
 
 # Security layers:
 | Layer | Description | Example Question |
@@ -27,7 +27,7 @@ To make the proposed framework changes clearer and to encourage broad discussion
 
 # References
 
-Stephen Rees Carter's article on the resource authorisation pattern which points out the "default open" problem with the current approach AuthorizeResource trait. This article was the seed crystal for the current proposal.
+Stephen Rees Carter's article on the resource authorisation pattern which points out the "default open" issue with the current approach framework provided AuthorizeResource trait. This article was the seed crystal for the current proposal.
 
 https://securinglaravel.com/security-tip-watch-out-for-resource/
 
