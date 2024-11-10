@@ -25,6 +25,116 @@ The proposal is in two parts:
 
 To make the proposed framework changes clearer and to encourage broad discussion among the Laravel security community, this package provides a proof of concept 'package based'implementation of the proposed changes. The proof of concept uses archtiecture patterns that would not be neccessary for the framework level changes to be implemented (Traits, Custom Middleware, Contracts, etc). 
 
+
+# Test Cases
+
+## Default Closed Test Case 1: Default Closed
+1. AuthorizeResource applied to a contoller.
+2. NeedsAuthorization enabled.
+3. Hit custom action.
+4. Fails with "This action is unauthorized because no policy was specified."
+
+## Default Closed Test Case 2: Opened by Custom Mapping
+1. AuthorizeResource applied to a contoller.
+2. NeedsAuthorization enabled.
+3. Hit custom action.
+4. Policy mapping applied to the custom action using the constructor array mapping
+5. Policy call made.
+6. Pass or fail as appropriate to Policy.
+
+## Default Closed Test Case 3: Opened by Attribute Mapping
+1. AuthorizeResource applied to a contoller.
+2. NeedsAuthorization enabled.
+3. Hit custom action.
+4. Policy mapping applied to the custom action using the attribute mapping
+5. Policy call made.
+6. Pass or fail as appropriate to Policy.
+
+## Default Closed Test Case 4: Requirement Override
+1. AuthorizeResource applied to a contoller.
+2. NeedsAuthorization enabled.
+3. Hit custom action.
+4. Policy has an attribute specified to override the requirement.
+5. No policy call made.
+6. Pass.
+
+## Policy Mapping Test Case 1: Simple Attribute
+1. Policy method has a simple attribute meaning that 
+1.1. Model: The policy to be called is the Model in the AuthorizeResource trait.
+1.2. Action: The policy method to check is a simple match to the action name specified in the attribute.
+1.3. Instance: The model instance to check is the one found in the route model binding and type hinted in the controller method.
+2. Controller action uses the attribute.
+3. Policy method is called.
+4. Pass or fail as appropriate to Policy.
+
+## Policy Mapping Test Case 2: Complex Attribute Custom Model
+1. Policy method has a complex attribute where the policy to check is different to the model in the AuthorizeResource trait. We find this using the desired model / policy as a parameter in the policy method.
+2. Policy method is called.
+3. Pass or fail as appropriate to Policy (check correct policy is called).
+
+## Policy Mapping Test Case 3: Complex Attribute Custom Action
+1. Policy method has a complex attribute where the policy method to check is different to the action expected. We find this using the desired method name as a parameter in the policy method.
+2. Policy method is called.
+3. Pass or fail as appropriate to Policy (check correct policy method is called).
+
+## Policy Mapping Test Case 4: Complex Attribute Custom Instance
+1. Policy method has a complex attribute where the model instance to check is different to the one expected. We find this by specifying a parameter ID to use to find the relevant model instance.
+2. Policy method is called.
+3. Pass or fail as appropriate to Policy (check correct model instance is used).
+
+# Installation
+
+```bash
+composer require icehouse-ventures/laravel-policy-attributes
+```
+
+To apply the 'default closed' pattern, add the following to your middleware stack:
+
+```php
+'web' => [
+    \IcehouseVentures\LaravelPolicyAttributes\Middleware\NeedsAuthorization::class,
+],
+```
+
+To apply the policy mapping attributes, add the following to your controller:
+
+```php
+#[MapPolicyToResource]
+```
+
+# Usage
+In the example below, the `PostPolicy` will be called with the `view` method and the `$post` instance.
+
+```php
+// Simple attribute mapping
+#[PolicyCheck('view')]
+public function viewPostComments(Post $post): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different policy
+#[PolicyCheck(policy: ImagePolicy::class, method: 'view', parameter: 'image')]
+public function viewPostAttachments(Post $post, Image $image): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different method
+#[PolicyCheck(policy: PostPolicy::class, method: 'view', parameter: 'post')]
+public function viewPostAttachments(Post $post): Post
+{
+    return $post;
+}
+
+// Complex attribute mapping: Check a different instance
+#[PolicyCheck(policy: PostPolicy::class, method: 'view', parameter: 'post', id: 'postId')]
+public function viewPostAttachments(Post $post): Post
+{
+    return $post;
+}
+```
+
 # References
 
 Stephen Rees Carter's article on the resource authorisation pattern which points out the "default open" issue with the current approach framework provided AuthorizeResource trait. This article was the seed crystal for the current proposal.

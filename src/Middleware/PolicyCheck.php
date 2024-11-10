@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace IcehouseVentures\LaravelPolicyAttributes\Middleware;
 
-use App\Attributes\Policy;
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
 use Closure;
 use Illuminate\Http\Request;
 use ReflectionClass;

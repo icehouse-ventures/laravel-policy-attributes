@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Attributes;
+namespace IcehouseVentures\LaravelPolicyAttributes\Attributes;
 
 use Attribute;
 
@@ -9,6 +9,6 @@ class PolicyRequirementOverride
 {
     public function __construct()
     {
-        // Override the requirement for a policy to be applied to a method
+        // Override the requirement for a policy to be applied to a method.
     }
 }

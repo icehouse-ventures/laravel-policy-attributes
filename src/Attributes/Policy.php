@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Attributes;
+namespace IcehouseVentures\LaravelPolicyAttributes\Attributes;
 
 use Attribute;
 use Illuminate\Http\Request;

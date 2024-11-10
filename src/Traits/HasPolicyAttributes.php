@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Traits;
+namespace IcehouseVentures\LaravelPolicyAttributes\Traits;
 
-use App\Attributes\Policy;
-use App\Attributes\PolicyRequirementOverride;
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\PolicyRequirementOverride;
 use ReflectionAttribute;
 use ReflectionMethod;
 

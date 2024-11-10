@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Traits;
+namespace IcehouseVentures\LaravelPolicyAttributes\Traits;
 
-use App\Http\Middleware\PolicyCheck;
+use IcehouseVentures\LaravelPolicyAttributes\Middleware\PolicyCheck;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;

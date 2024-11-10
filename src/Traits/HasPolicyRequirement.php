@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Traits;
+namespace IcehouseVentures\LaravelPolicyAttributes\Traits;
 
-use App\Attributes\Policy;
-use App\Attributes\PolicyRequirementOverride;
-use App\Http\Middleware\PolicyRequirement;
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
+use IcehouseVentures\LaravelPolicyAttributes\Attributes\PolicyRequirementOverride;
+use IcehouseVentures\LaravelPolicyAttributes\Http\Middleware\PolicyRequirement;
 use ReflectionMethod;
 
 trait HasPolicyRequirement

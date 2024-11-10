@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace IcehouseVentures\LaravelPolicyAttributes\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
