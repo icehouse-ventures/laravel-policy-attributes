@@ -4,7 +4,7 @@ namespace IcehouseVentures\LaravelPolicyAttributes\Traits;
 
 use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
 use IcehouseVentures\LaravelPolicyAttributes\Attributes\PolicyRequirementOverride;
-use IcehouseVentures\LaravelPolicyAttributes\Http\Middleware\PolicyRequirement;
+use IcehouseVentures\LaravelPolicyAttributes\Middleware\PolicyRequirement;
 use ReflectionMethod;
 
 trait HasPolicyRequirement

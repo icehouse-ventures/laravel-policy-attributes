@@ -3,7 +3,6 @@
 namespace IcehouseVentures\LaravelPolicyAttributes\Traits;
 
 use IcehouseVentures\LaravelPolicyAttributes\Attributes\Policy;
-use IcehouseVentures\LaravelPolicyAttributes\Attributes\PolicyRequirementOverride;
 use ReflectionAttribute;
 use ReflectionMethod;
 
