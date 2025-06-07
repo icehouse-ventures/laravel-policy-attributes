@@ -8,6 +8,17 @@ Laravel provides us with world-class tools for foundation-level user authenticat
 
 The Laravel currently framework provides several ways to map these policies to resources using the AuthorizeResource trait. However, the current approach is 'default open' which means that if a policy is not specifcally mapped or called, the resource is open to all users.
 
+# Relationship with Laravel's UsePolicy Attribute
+
+Starting with Laravel 12.x, the framework includes a `UsePolicy` attribute. This package complements Laravel's built-in functionality by providing:
+
+1. **Default Closed Security** - Unlike Laravel's default approach, this package enforces a 'default closed' pattern where resources are restricted by default
+2. **Policy Mapping Attributes** - Our `Policy` attribute provides more flexible mapping options including custom policy classes, methods, and parameters
+3. **Policy Requirement Enforcement** - The `HasPolicyRequirement` trait ensures that a policy must be explicitly defined for each controller action
+4. **Complex Policy Mappings** - Support for checking different policies, methods, and model instances through attribute parameters
+
+This package is designed to work alongside Laravel's built-in policy features while providing additional security patterns and flexibility.
+
 # Proposal
 
 The proposal is in two parts:
